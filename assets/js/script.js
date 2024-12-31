@@ -32,24 +32,36 @@ function processLink() {
     const outputDiv = document.getElementById('output');
     outputDiv.innerHTML = ""; // Clear previous output
 
+    // Check if the URL is valid and starts with Seagate domains
+    const isSeagateUrl = input.startsWith("https://www.seagate.com/") || input.startsWith("https://wwwedit.seagate.com//");
+    if (!isSeagateUrl) {
+        outputDiv.innerHTML = `<p><span>Error:</span> The input is not a valid Seagate URL. Please enter a URL starting with 'https://www.seagate.com/' or 'https://wwwedit.seagate.com//'.</p>`;
+        return;
+    }
+
     // Determine the base path to replace: '/products/' or '/support/'
     const basePath = input.includes("/products/") ? "/products/" : input.includes("/support/") ? "/support/" : null;
 
-    // Check if the input is valid
+    // Check if the base path is valid
     if (!basePath) {
-        outputDiv.innerHTML = `<p><span>Error:</span> Please enter a valid link containing '/products/' or '/support/'.</p>`;
+        outputDiv.innerHTML = `<p><span>Error:</span> The input URL does not contain '/products/' or '/support/'. Please enter a valid Seagate URL.</p>`;
         return;
     }
 
     // Extract the part of the URL after the base path
     const relativePath = input.split(basePath)[1];
     if (!relativePath) {
-        outputDiv.innerHTML = `<p><span>Error:</span> The input link does not contain valid data after '${basePath}'.</p>`;
+        outputDiv.innerHTML = `<p><span>Error:</span> The input URL does not contain valid data after '${basePath}'.</p>`;
         return;
     }
 
+    // If the URL starts with "https://wwwedit.seagate.com//", update all base URLs to start with this domain
+    const updatedBaseUrls = input.startsWith("https://wwwedit.seagate.com//")
+        ? urls.map(url => url.replace("https://www.seagate.com/", "https://wwwedit.seagate.com//"))
+        : urls;
+
     // Generate the new URLs by appending the relative path to the base URLs
-    const updatedUrls = urls.map(url => url.replace("/products/", basePath) + relativePath);
+    const updatedUrls = updatedBaseUrls.map(url => url.replace("/products/", basePath) + relativePath);
 
     // Display the generated links, each on a new line
     updatedUrls.forEach(url => {
@@ -65,7 +77,6 @@ function processLink() {
     document.getElementById('copy-all-btn').style.display = "inline-block";
     document.getElementById('clear-btn').style.display = "inline-block";
 }
-
 
 function copyAllLinks() {
     const outputDiv = document.getElementById('output');
