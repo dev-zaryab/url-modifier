@@ -1,33 +1,68 @@
 const urls = [
-    "https://www.seagate.com/as/en/products/",
-    "https://www.seagate.com/au/en/products/",
-    "https://www.seagate.com/in/en/products/",
-    "https://www.seagate.com/id/id/products/",
-    "https://www.seagate.com/sg/en/products/",
-    "https://www.seagate.com/kr/ko/products/",
-    "https://www.seagate.com/jp/ja/products/",
-    "https://www.seagate.com/tw/zh/products/",
-    "https://www.seagate.com/cn/zh/products/",
-    "https://www.seagate.com/be/nl/products/",
-    "https://www.seagate.com/be/fr/products/",
-    "https://www.seagate.com/de/de/products/",
-    "https://www.seagate.com/es/es/products/",
-    "https://www.seagate.com/fr/fr/products/",
-    "https://www.seagate.com/it/it/products/",
-    "https://www.seagate.com/nl/nl/products/",
-    "https://www.seagate.com/pl/pl/products/",
-    "https://www.seagate.com/pt/pt/products/",
-    "https://www.seagate.com/gb/en/products/",
-    "https://www.seagate.com/em/en/products/",
-    "https://www.seagate.com/tr/tr/products/",
-    "https://www.seagate.com/br/pt/products/",
-    "https://www.seagate.com/la/es/products/",
-    "https://www.seagate.com/ca/en/products/",
-    "https://www.seagate.com/ca/fr/products/",
-    "https://www.seagate.com/products/"
+    "https://www.seagate.com/as/en/",
+    "https://www.seagate.com/au/en/",
+    "https://www.seagate.com/in/en/",
+    "https://www.seagate.com/id/id/",
+    "https://www.seagate.com/sg/en/",
+    "https://www.seagate.com/kr/ko/",
+    "https://www.seagate.com/jp/ja/",
+    "https://www.seagate.com/tw/zh/",
+    "https://www.seagate.com/cn/zh/",
+    "https://www.seagate.com/be/nl/",
+    "https://www.seagate.com/be/fr/",
+    "https://www.seagate.com/de/de/",
+    "https://www.seagate.com/es/es/",
+    "https://www.seagate.com/fr/fr/",
+    "https://www.seagate.com/it/it/",
+    "https://www.seagate.com/nl/nl/",
+    "https://www.seagate.com/pl/pl/",
+    "https://www.seagate.com/pt/pt/",
+    "https://www.seagate.com/gb/en/",
+    "https://www.seagate.com/em/en/",
+    "https://www.seagate.com/tr/tr/",
+    "https://www.seagate.com/br/pt/",
+    "https://www.seagate.com/la/es/",
+    "https://www.seagate.com/ca/en/",
+    "https://www.seagate.com/ca/fr/",
+    "https://www.seagate.com/"
 ];
 
-function processLink() {
+const regions = {
+    APAC: [
+        "https://www.seagate.com/as/en/",
+        "https://www.seagate.com/au/en/",
+        "https://www.seagate.com/in/en/",
+        "https://www.seagate.com/id/id/",
+        "https://www.seagate.com/sg/en/",
+        "https://www.seagate.com/kr/ko/",
+        "https://www.seagate.com/jp/ja/",
+        "https://www.seagate.com/tw/zh/",
+        "https://www.seagate.com/cn/zh/"
+    ],
+    EMEA: [
+        "https://www.seagate.com/be/nl/",
+        "https://www.seagate.com/be/fr/",
+        "https://www.seagate.com/de/de/",
+        "https://www.seagate.com/es/es/",
+        "https://www.seagate.com/fr/fr/",
+        "https://www.seagate.com/it/it/",
+        "https://www.seagate.com/nl/nl/",
+        "https://www.seagate.com/pl/pl/",
+        "https://www.seagate.com/pt/pt/",
+        "https://www.seagate.com/gb/en/",
+        "https://www.seagate.com/em/en/",
+        "https://www.seagate.com/tr/tr/"
+    ],
+    AMER: [
+        "https://www.seagate.com/br/pt/",
+        "https://www.seagate.com/la/es/",
+        "https://www.seagate.com/ca/en/",
+        "https://www.seagate.com/ca/fr/",
+        "https://www.seagate.com/"
+    ]
+};
+
+function processLink(region = null) {
     const input = document.getElementById('placeholderInput').value.trim();
     const outputDiv = document.getElementById('output');
     outputDiv.innerHTML = ""; // Clear previous output
@@ -39,29 +74,23 @@ function processLink() {
         return;
     }
 
-    // Determine the base path to replace: '/products/' or '/support/'
-    const basePath = input.includes("/products/") ? "/products/" : input.includes("/support/") ? "/support/" : null;
-
-    // Check if the base path is valid
-    if (!basePath) {
-        outputDiv.innerHTML = `<p><span>Error:</span> The input URL does not contain '/products/' or '/support/'. Please enter a valid Seagate URL.</p>`;
-        return;
-    }
-
-    // Extract the part of the URL after the base path
-    const relativePath = input.split(basePath)[1];
-    if (!relativePath) {
-        outputDiv.innerHTML = `<p><span>Error:</span> The input URL does not contain valid data after '${basePath}'.</p>`;
+    // Extract the path after the domain
+    const path = input.split('/').slice(3).join('/'); // Get everything after the domain
+    if (!path) {
+        outputDiv.innerHTML = `<p><span>Error:</span> The input URL does not contain valid data after the domain.</p>`;
         return;
     }
 
     // If the URL starts with "https://wwwedit.seagate.com//", update all base URLs to start with this domain
-    const updatedBaseUrls = input.startsWith("https://wwwedit.seagate.com//")
+    const baseUrls = input.startsWith("https://wwwedit.seagate.com//")
         ? urls.map(url => url.replace("https://www.seagate.com/", "https://wwwedit.seagate.com//"))
         : urls;
 
-    // Generate the new URLs by appending the relative path to the base URLs
-    const updatedUrls = updatedBaseUrls.map(url => url.replace("/products/", basePath) + relativePath);
+    // Filter URLs by region if a region is selected
+    const filteredUrls = region ? regions[region] : baseUrls;
+
+    // Generate the new URLs by appending the path to the base URLs
+    const updatedUrls = filteredUrls.map(url => url + path);
 
     // Display the generated links, each on a new line
     updatedUrls.forEach(url => {

@@ -15,6 +15,12 @@
         <input type="text" id="placeholderInput" placeholder="Enter a Seagate link">
         <button onclick="processLink()">Generate Links</button>
 
+        <div class="region-button-container">
+            <button id="apac-btn" onclick="processLink('APAC')">APAC</button>
+            <button id="emea-btn" onclick="processLink('EMEA')">EMEA</button>
+            <button id="amer-btn" onclick="processLink('AMER')">AMER</button>
+        </div>
+
         <div id="output"></div>
         <div>
             <button id="copy-all-btn" style="display: none;" onclick="copyAllLinks()">Copy All Links</button>
